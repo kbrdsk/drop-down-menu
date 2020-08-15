@@ -1,3 +1,17 @@
-.drop-down-menu{
-	overflow: hidden;
+.drop-down{
+	cursor: pointer;
+}
+
+.menu-item{
+	position: relative;
+}
+
+.menu-item[displaying=false]{
+	left: 5em;
+	opacity: 0;
+}
+
+.menu-item[displaying=true]{
+	left: 0em;
+	opacity: 1;
 }

@@ -1,13 +1,16 @@
 import "./style.css";
 
-let menuTransition = "height 0.5s ease-out";
+const itemTransition = "0.05s ease-out";
 
-let dropDowns = Array.from(document.getElementsByClassName("drop-down"));
+const dropDowns = Array.from(document.getElementsByClassName("drop-down"));
 dropDowns.map(buildDropDown);
 
 function buildDropDown(dropDown) {
-	let menuItems = Array.from(dropDown.getElementsByClassName("menu-item"));
-	let menu = buildMenu(menuItems);
+	const menuItems = Array.from(dropDown.getElementsByClassName("menu-item"));
+	const menu = buildMenu(menuItems, dropDown);
+
+	dropDown.expanded = false;
+	dropDown.menuItems = menuItems;
 
 	dropDown.addEventListener("mouseleave", () => collapseMenu(dropDown));
 
@@ -18,74 +21,42 @@ function buildDropDown(dropDown) {
 	collapseMenu(dropDown);
 }
 
-function buildMenu(menuItems) {
-	let menu = document.createElement("div");
+function buildMenu(menuItems, dropDown) {
+	const menu = document.createElement("div");
 	menu.classList.add("drop-down-menu");
-	for (let item of menuItems) {
+	menuItems.map((item, index) => {
+		item.addEventListener("transitionend", () => {
+			if (dropDown.expanded === true && menuItems[index + 1]) {
+				menuItems[index + 1].setAttribute("displaying", true);
+			}
+			if (dropDown.expanded === false && menuItems[(index - 1)]) {
+				menuItems[index - 1].setAttribute("displaying", false);
+			}
+		});
+		item.setAttribute("displaying", false);
+		item.style.transition = itemTransition;
 		menu.appendChild(item);
-	}
+	});
 
 	return menu;
 }
 
 function buildDropDownActivator(dropDown) {
-	let activator = dropDown.querySelector(".menu-activator");
+	const activator = dropDown.querySelector(".menu-activator");
 	activator.addEventListener("mouseenter", () => expandMenu(dropDown));
 }
 
-function collapseMenu(dropDown) {
-	disable(dropDown);
-
-	let menu = dropDown.querySelector(".drop-down-menu");
-	let menuHeight = menu.scrollHeight;
-	menu.style.transition = "";
-	menu.addEventListener("transitionend", reEnable(dropDown));
-
-	requestAnimationFrame(() => {
-		menu.style.height = menuHeight + "px";
-		menu.style.transition = menuTransition;
-
-		requestAnimationFrame(() => {
-			menu.style.height = 0 + "px";
-		});
-	});
-
-	menu.setAttribute("collapsed", true);
-}
-
 function expandMenu(dropDown) {
-	disable(dropDown);
-
-	let menu = dropDown.querySelector(".drop-down-menu");
-	let menuHeight = menu.scrollHeight;
-	menu.style.height = menuHeight + "px";
-
-	menu.addEventListener("transitionend", resetHeight(menu));
-	menu.addEventListener("transitionend", reEnable(dropDown));
-
-	menu.setAttribute("collapsed", false);
+	dropDown.expanded = true;
+	dropDown.menuItems[0].setAttribute("displaying", true);
 }
 
-function resetHeight(menu) {
-	function reset() {
-		menu.removeEventListener("transitionend", reset);
-		menu.style.height = null;
-	}
-
-	return reset;
-}
-
-function reEnable(dropDown) {
-	function reset() {
-		dropDown.removeEventListener("transitionend", reset);
-		dropDown.disabled = false;
-	dropDown.querySelector(".menu-activator").disabled = false;
-	}
-
-	return reset;
-}
-
-function disable(dropDown) {
-	dropDown.disabled = true;
-	dropDown.querySelector(".menu-activator").disabled = true;
+function collapseMenu(dropDown) {
+	dropDown.expanded = false;
+	let lastLoadedIndex = -1;
+	dropDown.menuItems.map((item) => {
+		if (item.getAttribute("displaying") === "true") lastLoadedIndex++;
+	});
+	if (lastLoadedIndex > -1)
+		dropDown.menuItems[lastLoadedIndex].setAttribute("displaying", false);
 }
