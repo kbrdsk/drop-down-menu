@@ -8,29 +8,27 @@ dropDowns.map(buildDropDown);
 function buildDropDown(dropDown) {
 	const menuItems = Array.from(dropDown.getElementsByClassName("menu-item"));
 	const menu = buildMenu(menuItems, dropDown);
-
-	dropDown.expanded = false;
-	dropDown.menuItems = menuItems;
-
-	dropDown.addEventListener("mouseleave", () => collapseMenu(dropDown));
-
 	dropDown.appendChild(menu);
 
+	dropDown.addEventListener("mouseleave", () => collapseMenu(dropDown));
 	buildDropDownActivator(dropDown);
 
-	collapseMenu(dropDown);
+	Object.assign(dropDown, { menuItems, menu, expanded: false });
 }
 
 function buildMenu(menuItems, dropDown) {
 	const menu = document.createElement("div");
 	menu.classList.add("drop-down-menu");
+	menu.setAttribute("displaying", false);
 	menuItems.map((item, index) => {
 		item.addEventListener("transitionend", () => {
 			if (dropDown.expanded === true && menuItems[index + 1]) {
 				menuItems[index + 1].setAttribute("displaying", true);
 			}
-			if (dropDown.expanded === false && menuItems[(index - 1)]) {
-				menuItems[index - 1].setAttribute("displaying", false);
+			if (dropDown.expanded === false) {
+				if (menuItems[index - 1])
+					menuItems[index - 1].setAttribute("displaying", false);
+				else menu.setAttribute("displaying", false);
 			}
 		});
 		item.setAttribute("displaying", false);
@@ -47,6 +45,7 @@ function buildDropDownActivator(dropDown) {
 }
 
 function expandMenu(dropDown) {
+	dropDown.menu.setAttribute("displaying", true);
 	dropDown.expanded = true;
 	dropDown.menuItems[0].setAttribute("displaying", true);
 }

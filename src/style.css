@@ -2,6 +2,15 @@
 	cursor: pointer;
 }
 
+.drop-down-menu[displaying=false]{
+	height: 0;
+	overflow: hidden;
+}
+
+.drop-down-menu[displaying=true]{
+	height: auto;
+}
+
 .menu-item{
 	position: relative;
 }
