@@ -1,5 +1,17 @@
 .drop-down{
 	cursor: pointer;
+	width: 7em;
+}
+
+.menu-activator{
+	padding: 0.5em;
+	width: auto;
+	background: grey;
+	color: gold;
+	font-weight: bold;
+}
+
+.drop-down-menu{
 }
 
 .drop-down-menu[displaying=false]{
@@ -13,6 +25,9 @@
 
 .menu-item{
 	position: relative;
+	padding: 0.2em;
+	background-color: gold;
+	margin: 0.1em;
 }
 
 .menu-item[displaying=false]{
